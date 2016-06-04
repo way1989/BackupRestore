@@ -1161,7 +1161,7 @@ public class PersonalDataBackupActivity extends AbstractBackupActivity implement
                         ModuleType.TYPE_CONTACT,
                         ModuleType.TYPE_MESSAGE,
                         ModuleType.TYPE_PICTURE,
-//                        ModuleType.TYPE_CALENDAR,
+                        ModuleType.TYPE_CALENDAR,
                         ModuleType.TYPE_MUSIC,
 //                    ModuleType.TYPE_BOOKMARK
                 };
@@ -1175,7 +1175,7 @@ public class PersonalDataBackupActivity extends AbstractBackupActivity implement
                     types = new int[] {
                         ModuleType.TYPE_CONTACT,
                         ModuleType.TYPE_PICTURE,
-//                        ModuleType.TYPE_CALENDAR,
+                        ModuleType.TYPE_CALENDAR,
                         ModuleType.TYPE_MUSIC,
 //                    ModuleType.TYPE_BOOKMARK
                     };

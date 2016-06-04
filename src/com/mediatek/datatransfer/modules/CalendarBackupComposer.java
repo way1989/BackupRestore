@@ -46,7 +46,7 @@ import com.mediatek.datatransfer.utils.Constants.ModulePath;
 import com.mediatek.datatransfer.utils.FileUtils;
 import com.mediatek.datatransfer.utils.ModuleType;
 import com.mediatek.datatransfer.utils.MyLogger;
-//import com.mediatek.vcalendar.VCalComposer;
+import com.mediatek.vcalendar.VCalComposer;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -66,7 +66,7 @@ public class CalendarBackupComposer extends Composer {
     private Cursor mCursor;
     private ArrayList<Integer> mFailEvents;
 
-    //private VCalComposer mVCalComposer;
+    private VCalComposer mVCalComposer;
     BufferedWriter mOut;
 
     /**
@@ -117,26 +117,26 @@ public class CalendarBackupComposer extends Composer {
         mCursor = mContext.getContentResolver().query(calanderEventURI, null, null, null, null);
 
         if (mCursor != null) {
-//            mCursor.moveToFirst();
-//            mVCalComposer = new VCalComposer(mContext);
-//            MyLogger.logD(CLASS_TAG, "init() begin");
-//            for (int i = 0; i < mCursor.getCount(); i++) {
-//                int id = 0;
-//                try {
-//                    id = mCursor.getInt(mCursor.getColumnIndex("_id"));
-//                    MyLogger.logD(CLASS_TAG, "init() id = " + id);
-//                    String vcal = mVCalComposer.buildVEventString(id);
-//                    MyLogger.logD(CLASS_TAG, "init() vcal = " + vcal);
-//                    if (vcal == null) {
-//                        mFailEvents.add(id);
-//                    }
-//                    mCursor.moveToNext();
-//                } catch (Exception e) {
-//                    mFailEvents.add(id);
-//                    MyLogger.logD(CLASS_TAG, "VCAL: init() fail");
-//                }
-//            }
-//            mCursor.moveToFirst();
+            mCursor.moveToFirst();
+            mVCalComposer = new VCalComposer(mContext);
+            MyLogger.logD(CLASS_TAG, "init() begin");
+            for (int i = 0; i < mCursor.getCount(); i++) {
+                int id = 0;
+                try {
+                    id = mCursor.getInt(mCursor.getColumnIndex("_id"));
+                    MyLogger.logD(CLASS_TAG, "init() id = " + id);
+                    String vcal = mVCalComposer.buildVEventString(id);
+                    MyLogger.logD(CLASS_TAG, "init() vcal = " + vcal);
+                    if (vcal == null) {
+                        mFailEvents.add(id);
+                    }
+                    mCursor.moveToNext();
+                } catch (Exception e) {
+                    mFailEvents.add(id);
+                    MyLogger.logD(CLASS_TAG, "VCAL: init() fail");
+                }
+            }
+            mCursor.moveToFirst();
         } else {
             result = false;
         }
@@ -174,17 +174,17 @@ public class CalendarBackupComposer extends Composer {
             MyLogger.logD(CLASS_TAG, "implementComposeOneEntity id:" + id);
             mCursor.moveToNext();
 
-//            if (mVCalComposer != null && mOut != null) {
-//                try {
-//                    String vcal = mVCalComposer.buildVEventString(id);
-//                    if (vcal != null) {
-//                        mOut.write(vcal);
-//                        result = true;
-//                    }
-//                } catch (Exception e) {
-//                    MyLogger.logD(CLASS_TAG, "VCAL: implementComposeOneEntity() write file failed");
-//                }
-//            }
+            if (mVCalComposer != null && mOut != null) {
+                try {
+                    String vcal = mVCalComposer.buildVEventString(id);
+                    if (vcal != null) {
+                        mOut.write(vcal);
+                        result = true;
+                    }
+                } catch (Exception e) {
+                    MyLogger.logD(CLASS_TAG, "VCAL: implementComposeOneEntity() write file failed");
+                }
+            }
         }
 
         return result;
@@ -196,36 +196,36 @@ public class CalendarBackupComposer extends Composer {
      */
     public final void onStart() {
         super.onStart();
-//        if (mVCalComposer != null) {
-//            if (getCount() > 0) {
-//                File path = new File(mParentFolderPath + File.separator
-//                        + ModulePath.FOLDER_CALENDAR);
-//                if (!path.exists()) {
-//                    path.mkdirs();
-//                }
-//
-//                File file = new File(path.getAbsolutePath() + File.separator
-//                        + ModulePath.NAME_CALENDAR);
-//                if (!file.exists()) {
-//                    try {
-//                        file.createNewFile();
-//                    } catch (Exception e) {
-//                        MyLogger.logE(CLASS_TAG, "onStart():create file failed");
-//                    }
-//                }
-//
-//                try {
-//                    FileWriter fstream = new FileWriter(file);
-//                    mOut = new BufferedWriter(fstream);
-//                    String vcal = mVCalComposer.getVCalHead();
-//                    if (vcal != null) {
-//                        mOut.write(vcal);
-//                    }
-//                } catch (Exception e) {
-//                    MyLogger.logD(CLASS_TAG, "VCAL: onStart() write file failed");
-//                }
-//            }
-//        }
+        if (mVCalComposer != null) {
+            if (getCount() > 0) {
+                File path = new File(mParentFolderPath + File.separator
+                        + ModulePath.FOLDER_CALENDAR);
+                if (!path.exists()) {
+                    path.mkdirs();
+                }
+
+                File file = new File(path.getAbsolutePath() + File.separator
+                        + ModulePath.NAME_CALENDAR);
+                if (!file.exists()) {
+                    try {
+                        file.createNewFile();
+                    } catch (Exception e) {
+                        MyLogger.logE(CLASS_TAG, "onStart():create file failed");
+                    }
+                }
+
+                try {
+                    FileWriter fstream = new FileWriter(file);
+                    mOut = new BufferedWriter(fstream);
+                    String vcal = mVCalComposer.getVCalHead();
+                    if (vcal != null) {
+                        mOut.write(vcal);
+                    }
+                } catch (Exception e) {
+                    MyLogger.logD(CLASS_TAG, "VCAL: onStart() write file failed");
+                }
+            }
+        }
     }
 
     /**
@@ -240,23 +240,23 @@ public class CalendarBackupComposer extends Composer {
         }
 
         MyLogger.logD(CLASS_TAG, "onEnd");
-//        if (mVCalComposer != null) {
-//            if (mOut != null) {
-//                try {
-//                    String vcal = mVCalComposer.getVCalEnd();
-//                    if (vcal != null) {
-//                        mOut.write(vcal);
-//                    }
-//                } catch (Exception e) {
-//                    MyLogger.logD(CLASS_TAG, "VCAL: onEnd() write file failed");
-//                } finally {
-//                    try {
-//                        mOut.close();
-//                    } catch (IOException e) {
-//                        MyLogger.logD(CLASS_TAG, "IOException");
-//                    }
-//                }
-//            }
-//        }
+        if (mVCalComposer != null) {
+            if (mOut != null) {
+                try {
+                    String vcal = mVCalComposer.getVCalEnd();
+                    if (vcal != null) {
+                        mOut.write(vcal);
+                    }
+                } catch (Exception e) {
+                    MyLogger.logD(CLASS_TAG, "VCAL: onEnd() write file failed");
+                } finally {
+                    try {
+                        mOut.close();
+                    } catch (IOException e) {
+                        MyLogger.logD(CLASS_TAG, "IOException");
+                    }
+                }
+            }
+        }
     }
 }

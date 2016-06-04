@@ -49,18 +49,17 @@ import android.provider.CalendarContract;
 import com.mediatek.datatransfer.utils.Constants.ModulePath;
 import com.mediatek.datatransfer.utils.ModuleType;
 import com.mediatek.datatransfer.utils.MyLogger;
-//import com.mediatek.vcalendar.VCalParser;
-//import com.mediatek.vcalendar.VCalStatusChangeOperator;
+import com.mediatek.vcalendar.VCalParser;
+import com.mediatek.vcalendar.VCalStatusChangeOperator;
 
-public class CalendarRestoreComposer extends Composer {
-//implements VCalStatusChangeOperator {
+public class CalendarRestoreComposer extends Composer implements VCalStatusChangeOperator {
     private static final String CLASS_TAG = MyLogger.LOG_TAG + "/CalendarRestoreComposer";
     private static final String COLUMN_ID = "_id";
     private static final Uri calanderEventURI = CalendarContract.Events.CONTENT_URI;
     private int mIndex;
     private boolean mResult = true;
 
-//    VCalParser mCalParser;
+    VCalParser mCalParser;
     private int mCount;
 
     /**
@@ -99,7 +98,7 @@ public class CalendarRestoreComposer extends Composer {
      */
     public boolean init() {
         boolean result = false;
-        //mCalParser = null;
+        mCalParser = null;
         String fileName = mParentFolderPath + File.separator + ModulePath.FOLDER_CALENDAR
                 + File.separator + ModulePath.NAME_CALENDAR;
         File file = new File(fileName);
@@ -108,7 +107,7 @@ public class CalendarRestoreComposer extends Composer {
             if (fileName.contains("#")) {
                 return false;
             }
-            //mCalParser = new VCalParser(Uri.parse("file://" + fileName), mContext, this);
+            mCalParser = new VCalParser(Uri.parse("file://" + fileName), mContext, this);
             mIndex = 0;
             result = true;
         }
@@ -194,22 +193,22 @@ public class CalendarRestoreComposer extends Composer {
     public void onStart() {
         mResult = true;
         deleteAllCalendarEvents();
-        //if (mCalParser != null) {
+        if (mCalParser != null) {
             // Note: all the restoration work are done here
-           //mCalParser.startParse();
-        //} else {
+            mCalParser.startParse();
+        } else {
             // init() failed, jump over
             super.onStart();
-        //}
+        }
 
         MyLogger.logD(CLASS_TAG, "onStart()");
     }
 
 
     public void onEnd() {
-//        if (mCalParser != null) {
-//            mCalParser.close();
-//        }
+        if (mCalParser != null) {
+            mCalParser.close();
+        }
 
         super.onEnd();
         MyLogger.logD(CLASS_TAG, "onEnd()");
@@ -219,12 +218,12 @@ public class CalendarRestoreComposer extends Composer {
      * Will be called when compose/parse started.
      * @param totalCount total count of items
      */
-    //@Override
-//    public void vCalOperationStarted(int totalCount) {
-//        mCount = totalCount;
-//        super.onStart();
-//        MyLogger.logD(CLASS_TAG, "vCalOperationStarted():" + totalCount);
-//    }
+    @Override
+    public void vCalOperationStarted(int totalCount) {
+        mCount = totalCount;
+        super.onStart();
+        MyLogger.logD(CLASS_TAG, "vCalOperationStarted():" + totalCount);
+    }
 
     /**
      * Will be called when the compose/parse operation finished
@@ -234,13 +233,13 @@ public class CalendarRestoreComposer extends Composer {
      * @param totalCnt
      *            total count
      */
-//    @Override
-//    public void vCalOperationFinished(int successCnt, int totalCnt, Object obj) {
-//        mResult = true;
-//        MyLogger.logD(
-//                CLASS_TAG,
-//                "vCalOperationFinished(): success " + successCnt + ", total " + totalCnt);
-//    }
+    @Override
+    public void vCalOperationFinished(int successCnt, int totalCnt, Object obj) {
+        mResult = true;
+        MyLogger.logD(
+                CLASS_TAG,
+                "vCalOperationFinished(): success " + successCnt + ", total " + totalCnt);
+    }
 
     /**
      * Will be called when the process status update
@@ -250,14 +249,14 @@ public class CalendarRestoreComposer extends Composer {
      * @param totalCount
      *            total count
      */
-//    @Override
-//    public void vCalProcessStatusUpdate(int currentCount, int totalCount) {
-//        mCount = totalCount;
-//        increaseComposed(true);
-//        MyLogger.logD(
-//                CLASS_TAG,
-//                "vCalProcessStatusUpdate(): current " + currentCount + ", total " + totalCount);
-//    }
+    @Override
+    public void vCalProcessStatusUpdate(int currentCount, int totalCount) {
+        mCount = totalCount;
+        increaseComposed(true);
+        MyLogger.logD(
+                CLASS_TAG,
+                "vCalProcessStatusUpdate(): current " + currentCount + ", total " + totalCount);
+    }
 
     /**
      * Will be called when the cancel request has been finished.
@@ -267,10 +266,10 @@ public class CalendarRestoreComposer extends Composer {
      * @param totalCnt
      *            total count
      */
-//    @Override
-//    public void vCalOperationCanceled(int finishedCnt, int totalCnt) {
-//        throw new Error("vCalOperationCanceled should not be called.");
-//    }
+    @Override
+    public void vCalOperationCanceled(int finishedCnt, int totalCnt) {
+        throw new Error("vCalOperationCanceled should not be called.");
+    }
 
     /**
      * Will be called when exception occurred.
@@ -282,13 +281,13 @@ public class CalendarRestoreComposer extends Composer {
      * @param type
      *            the exception type.
      */
-//    @Override
-//    public void vCalOperationExceptionOccured(int finishedCnt, int totalCnt, int type) {
-//        mResult = false;
-//        MyLogger.logD(
-//                CLASS_TAG,
-//                "vCalOperationExceptionOccured():finishedCnt:" + finishedCnt
-//                        + "; totalCnt:" + totalCnt + "; type: " + type);
-//    }
+    @Override
+    public void vCalOperationExceptionOccured(int finishedCnt, int totalCnt, int type) {
+        mResult = false;
+        MyLogger.logD(
+                CLASS_TAG,
+                "vCalOperationExceptionOccured():finishedCnt:" + finishedCnt
+                        + "; totalCnt:" + totalCnt + "; type: " + type);
+    }
 }
 
